@@ -52,7 +52,7 @@ export default function FeaturesGrid() {
             Un écosystème unifié conçu pour sécuriser chaque récolte et optimiser la chaîne d'approvisionnement mondiale.
           </p>
         </div>
-
+        
         <div className="grid md:grid-cols-3 gap-8">
           {features.map((f, i) => (
             <motion.div

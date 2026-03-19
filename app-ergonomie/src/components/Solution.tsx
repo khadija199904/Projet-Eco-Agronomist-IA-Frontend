@@ -43,13 +43,13 @@ export default function Solution() {
 
       <div className="container mx-auto px-6 relative z-10">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-5xl md:text-6xl font-serif leading-tight text-emerald-950">
+          <h2 className="text-5xl md:text-7xl font-serif leading-[0.9] tracking-tighter text-emerald-950">
             L’Écosystème Digital de la <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-fresh-green">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-fresh-green italic font-display font-light">
               Résilience Agricole
             </span>
           </h2>
-          <p className="text-slate-600 text-lg">
+          <p className="text-stone-500 text-xl leading-relaxed font-light mx-auto max-w-2xl">
             Eco Agronomist IA unifie chaque étape de la filière marocaine pour transformer
             le potentiel de nos terres en une sécurité durable.
           </p>
