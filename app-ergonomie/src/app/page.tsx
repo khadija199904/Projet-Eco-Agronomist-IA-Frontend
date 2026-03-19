@@ -7,9 +7,13 @@ import FeaturesGrid from 'src/components/Features';
 import Solution from 'src/components/Solution';
 import { motion } from 'motion/react';
 import { Sprout } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 
 export default function Home() {
   const [currentView, setCurrentView] = useState('home');
+  const router = useRouter();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -43,8 +47,11 @@ export default function Home() {
   };
 
   const handleAppEnter = () => {
-    console.log('Transitioning to platform...');
-    // Ici vous pouvez ajouter la logique pour changer de page ou d'état global
+    if (isAuthenticated) {
+      router.push('/dashboard'); // Or the actual platform route
+    } else {
+      router.push('/login');
+    }
   };
 
   return (
