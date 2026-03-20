@@ -157,12 +157,44 @@ export default function DiagnosticPlantePage() {
                                 </div>
                                 <h2 className="text-4xl font-serif font-bold">{result.disease_detected || "Sain / Vigoureux"}</h2>
                                 <div className="flex items-center gap-4 mt-6">
-                                    <div className="px-4 py-1.5 bg-white/10 rounded-full text-sm border border-white/10">Indice de confiance : 98%</div>
+                                    <div className="px-4 py-1.5 bg-white/10 rounded-full text-sm border border-white/10">
+                                        Indice de confiance : {result.detection_details?.confidence || 98}%
+                                    </div>
+                                    {result.detection_details?.culture && (
+                                        <div className="px-4 py-1.5 bg-fresh-green text-emerald-950 rounded-full text-sm font-bold">
+                                            Culture : {result.detection_details.culture}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 
                             <div className="p-8 grid md:grid-cols-2 gap-8">
                                 <div className="space-y-6">
+                                    <div className="grid grid-cols-1 gap-4">
+                                        <div className="bg-stone-50 p-6 rounded-2xl border border-stone-100">
+                                            <h4 className="font-bold text-emerald-900 mb-3 flex items-center gap-2 uppercase text-xs tracking-wider">
+                                                <div className="w-1.5 h-4 bg-emerald-500 rounded-full" /> Détails du Diagnostic
+                                            </h4>
+
+                                            <div className="mb-4 pb-4 border-b border-stone-200">
+                                                <p className="text-stone-600 text-sm">
+                                                    Cible : <span className="text-emerald-900 font-bold">{result.detection_details?.full_name_en || "N/A"}, {result.detection_details?.short_code || "N/A"}</span>
+                                                </p>
+                                            </div>
+
+                                            <div className="space-y-3">
+                                                <p className="text-stone-600 text-xs font-bold uppercase tracking-tight">Pathologies Détectées:</p>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {result.detection_details?.pathologies?.map((path: string, i: number) => (
+                                                        <span key={i} className="px-3 py-1 bg-white border border-emerald-100 rounded-lg text-emerald-800 text-xs font-medium shadow-sm">
+                                                            {path}
+                                                        </span>
+                                                    )) || <span className="text-stone-400 text-xs italic">Aucune pathologie spécifique détectée</span>}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <div>
                                         <h4 className="font-bold text-emerald-900 mb-2 flex items-center gap-2 italic">
                                             <div className="w-1.5 h-4 bg-emerald-500 rounded-full" /> Conseil du Dr. Agronome
@@ -176,8 +208,17 @@ export default function DiagnosticPlantePage() {
                                     </button>
                                 </div>
                                 <div className="relative">
-                                    <img src={preview!} alt="Analysed leaf" className="w-full aspect-square object-cover rounded-2xl shadow-inner border border-stone-100" />
+                                    <img
+                                        src={result.image_url ? `http://localhost:8000/${result.image_url}` : preview!}
+                                        alt="Analysed leaf"
+                                        className="w-full aspect-square object-cover rounded-2xl shadow-inner border border-stone-100"
+                                    />
                                     <div className="absolute inset-4 border-2 border-fresh-green/30 rounded-lg pointer-events-none" />
+                                    {result.image_url && (
+                                        <div className="absolute top-4 right-4 bg-fresh-green text-emerald-950 text-[10px] font-bold px-2 py-1 rounded shadow-lg uppercase tracking-wider">
+                                            IA Detection Active
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>

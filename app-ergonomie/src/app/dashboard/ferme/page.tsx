@@ -11,7 +11,11 @@ import {
 } from 'lucide-react';
 import { motion } from 'motion/react';
 
+import { useRouter } from 'next/navigation';
+import HealthChart from '@/components/HealthChart';
+
 export default function FermeDashboard() {
+    const router = useRouter();
     const stats = [
         { label: "Cultures Actives", value: "4", icon: Sprout, color: "text-emerald-600", bg: "bg-emerald-50" },
         { label: "Alertes Maladies", value: "1", icon: AlertCircle, color: "text-amber-600", bg: "bg-amber-50" },
@@ -27,7 +31,10 @@ export default function FermeDashboard() {
                     <h1 className="text-3xl font-serif font-bold text-emerald-950">Espace Ferme</h1>
                     <p className="text-stone-500 mt-1">Gérez votre exploitation et surveillez la santé de vos cultures.</p>
                 </div>
-                <button className="flex items-center gap-2 px-6 py-3 bg-emerald-950 text-white font-bold rounded-xl hover:bg-emerald-900 transition-all shadow-lg shadow-emerald-950/20">
+                <button
+                    onClick={() => router.push('/dashboard/ferme/diagnostic')}
+                    className="flex items-center gap-2 px-6 py-3 bg-emerald-950 text-white font-bold rounded-xl hover:bg-emerald-900 transition-all shadow-lg shadow-emerald-950/20"
+                >
                     <Plus className="w-5 h-5" />
                     Nouveau Diagnostic
                 </button>
@@ -57,8 +64,8 @@ export default function FermeDashboard() {
             {/* Main Content Areas */}
             <div className="grid lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2 space-y-8">
-                    <div className="bg-white rounded-3xl border border-emerald-100/50 p-8 shadow-sm h-96 flex items-center justify-center text-stone-400 italic">
-                        [ Graphique d'évolution de la santé des cultures ]
+                    <div className="bg-white rounded-3xl border border-emerald-100/50 p-8 shadow-sm h-96">
+                        <HealthChart />
                     </div>
                 </div>
                 <div className="bg-white rounded-3xl border border-emerald-100/50 p-8 shadow-sm">
