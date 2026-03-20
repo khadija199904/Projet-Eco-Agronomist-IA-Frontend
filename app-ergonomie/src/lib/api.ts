@@ -130,3 +130,36 @@ export const diagnosticAPI = {
         return response.json();
     }
 };
+
+export const productionAPI = {
+    // Crée un nouveau lot de récolte
+    createLotRecolte: async (data: any): Promise<any> => {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_BASE_URL}/production/lot_recolte`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.detail || "Erreur lors de la création du lot");
+        }
+        return response.json();
+    },
+
+    // Récupère les lots de la ferme de l'utilisateur
+    getMyLots: async (): Promise<any> => {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_BASE_URL}/production/ma-ferme`, {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+        if (!response.ok) throw new Error("Erreur lors de la récupération des lots");
+        return response.json();
+    }
+};
