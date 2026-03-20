@@ -28,7 +28,6 @@ export default function Sidebar() {
         { name: 'Tableau de Bord', href: '/dashboard/ferme', icon: LayoutDashboard },
         { name: 'Diagnostic Plante', href: '/dashboard/ferme/diagnostic', icon: Leaf },
         { name: 'Mes Lots', href: '/dashboard/ferme/lots', icon: Package },
-        { name: 'Production', href: '/dashboard/ferme/production', icon: Activity },
     ];
 
     const qualiteItems = [
