@@ -161,5 +161,71 @@ export const productionAPI = {
         });
         if (!response.ok) throw new Error("Erreur lors de la récupération des lots");
         return response.json();
+    },
+
+    // Récupère tous les lots (avec filtre ferme optionnel)
+    getLots: async (fermeId?: number): Promise<any> => {
+        const token = localStorage.getItem('token');
+        const url = fermeId
+            ? `${API_BASE_URL}/production/lots?ferme_id=${fermeId}`
+            : `${API_BASE_URL}/production/lots`;
+
+        const response = await fetch(url, {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+        if (!response.ok) throw new Error("Erreur lors de la récupération des lots");
+        return response.json();
+    }
+};
+
+export const valorisationAPI = {
+    // Enregistre l'arrivée d'un lot à la station
+    recordReception: async (data: any): Promise<any> => {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_BASE_URL}/valorisation/reception`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.detail || "Erreur lors de l'enregistrement de la réception");
+        }
+        return response.json();
+    },
+
+    // Récupère toutes les réceptions de la station (lots réceptionnés)
+    getAllReceptions: async (): Promise<any[]> => {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_BASE_URL}/valorisation/receptions`, {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+        if (!response.ok) return [];
+        return response.json();
+    },
+
+    // Récupère les détails de réception pour un lot spécifique
+    getReception: async (lotId: number): Promise<any> => {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_BASE_URL}/valorisation/reception/${lotId}`, {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+        if (!response.ok) {
+            console.warn(`[Reception] Lot ${lotId}: HTTP ${response.status}`);
+            return null;
+        }
+        const data = await response.json();
+        console.log(`[Reception] Lot ${lotId}:`, data);
+        return data;
     }
 };
