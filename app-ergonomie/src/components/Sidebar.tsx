@@ -14,7 +14,8 @@ import {
     Settings,
     LogOut,
     ChevronRight,
-    User as UserIcon
+    User as UserIcon,
+    Truck
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
@@ -32,6 +33,7 @@ export default function Sidebar() {
 
     const qualiteItems = [
         { name: 'Console Station', href: '/dashboard/station', icon: LayoutDashboard },
+        { name: 'Réception', href: '/dashboard/station/reception', icon: Truck },
         { name: 'Diagnostic Produit', href: '/dashboard/station/diagnostic', icon: Sprout },
         { name: 'Rapports d\'Agréage', href: '/dashboard/station/rapports', icon: BarChart3 },
         { name: 'Valorisation', href: '/dashboard/station/valorisation', icon: Zap },

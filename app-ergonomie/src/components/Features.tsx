@@ -12,17 +12,17 @@ const Card = ({ children, className }: { children: React.ReactNode; className?: 
 export default function FeaturesGrid() {
   const features = [
     {
-      icon: <Microscope />,
+      icon: Microscope,
       title: "Diagnostic Phytosanitaire",
       desc: "Détection instantanée des maladies grâce à des modèles de vision par ordinateur de pointe."
     },
     {
-      icon: <ShieldCheck />,
+      icon: ShieldCheck,
       title: "Traçabilité Totale",
       desc: "Suivez vos produits du champ à l'assiette avec une transparence garantie à chaque étape."
     },
     {
-      icon: <Zap />,
+      icon: Zap,
       title: "Système de Traitement RAG",
       desc: "Recevez des protocoles de traitement précis et personnalisés selon votre culture et votre région."
     }
@@ -52,7 +52,7 @@ export default function FeaturesGrid() {
             Un écosystème unifié conçu pour sécuriser chaque récolte et optimiser la chaîne d'approvisionnement mondiale.
           </p>
         </div>
-        
+
         <div className="grid md:grid-cols-3 gap-8">
           {features.map((f, i) => (
             <motion.div
@@ -68,7 +68,7 @@ export default function FeaturesGrid() {
 
                 <div className="relative z-10">
                   <div className="w-16 h-16 bg-emerald-50 rounded-[24px] flex items-center justify-center mb-10 group-hover:scale-110 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500 shadow-sm text-emerald-600">
-                    {React.cloneElement(f.icon as React.ReactElement, { size: 28, className: "transition-colors duration-500" })}
+                    <f.icon size={28} className="transition-colors duration-500" />
                   </div>
                   <h3 className="text-2xl font-bold mb-4 tracking-tight text-emerald-900">{f.title}</h3>
                   <p className="text-stone-500 leading-relaxed font-light mb-8 text-lg">{f.desc}</p>

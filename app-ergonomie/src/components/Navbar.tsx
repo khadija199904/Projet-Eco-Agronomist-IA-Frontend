@@ -23,8 +23,7 @@ export default function Navbar({ onNavigate, onAppEnter, currentView }: NavbarPr
     { id: 'home', label: 'Accueil' },
     { id: 'features', label: 'Features' },
     { id: 'solutions', label: 'Solutions' },
-    { id: 'scanner', label: 'Diagnostic' },
-    { id: 'dashboard', label: 'Usine' },
+    
   ];
 
   return (
