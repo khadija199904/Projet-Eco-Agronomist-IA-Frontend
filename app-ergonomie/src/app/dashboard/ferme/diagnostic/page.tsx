@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from 'react';
-import { Leaf, Camera, Upload, AlertCircle, Loader2, CheckCircle2, ChevronRight } from 'lucide-react';
+import { Leaf, Camera, Upload, AlertCircle, Loader2, CheckCircle2, ChevronRight, ClipboardList, Pill } from 'lucide-react';
 import { diagnosticAPI } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import { motion, AnimatePresence } from 'motion/react';
@@ -17,6 +17,11 @@ export default function DiagnosticPlantePage() {
     const [isScannerOpen, setIsScannerOpen] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
+    // Ordonnance RAG state
+    const [ordonnance, setOrdonnance] = useState<any>(null);
+    const [isLoadingOrdonnance, setIsLoadingOrdonnance] = useState(false);
+    const [ordonnanceError, setOrdonnanceError] = useState<string | null>(null);
+
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = e.target.files?.[0];
         if (selectedFile) {
@@ -24,6 +29,8 @@ export default function DiagnosticPlantePage() {
             setPreview(URL.createObjectURL(selectedFile));
             setResult(null);
             setError(null);
+            setOrdonnance(null);
+            setOrdonnanceError(null);
         }
     };
 
@@ -50,11 +57,30 @@ export default function DiagnosticPlantePage() {
         }
     };
 
+    const handleGetOrdonnance = async () => {
+        if (!result?.id) return;
+        setIsLoadingOrdonnance(true);
+        setOrdonnanceError(null);
+        setOrdonnance(null);
+        try {
+            const culture = result.detection_details?.culture;
+            const data = await diagnosticAPI.getOrdonnance(result.id, culture);
+            setOrdonnance(data);
+        } catch (err: any) {
+            console.error("Ordonnance error:", err);
+            setOrdonnanceError(err.message || "Erreur lors de la génération de l'ordonnance.");
+        } finally {
+            setIsLoadingOrdonnance(false);
+        }
+    };
+
     const reset = () => {
         setFile(null);
         setPreview(null);
         setResult(null);
         setError(null);
+        setOrdonnance(null);
+        setOrdonnanceError(null);
     };
 
     return (
@@ -147,8 +173,9 @@ export default function DiagnosticPlantePage() {
                         key="result"
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className="space-y-8"
+                        className="space-y-6"
                     >
+                        {/* ── Carte résultat diagnostic ─────────────────── */}
                         <div className="bg-white rounded-3xl border border-emerald-100 overflow-hidden shadow-xl">
                             <div className="bg-emerald-900 p-8 text-white relative overflow-hidden">
                                 <div className="absolute top-0 right-0 w-64 h-64 bg-fresh-green/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
@@ -170,43 +197,32 @@ export default function DiagnosticPlantePage() {
 
                             <div className="p-8 grid md:grid-cols-2 gap-8">
                                 <div className="space-y-6">
-                                    <div className="grid grid-cols-1 gap-4">
-                                        <div className="bg-stone-50 p-6 rounded-2xl border border-stone-100">
-                                            <h4 className="font-bold text-emerald-900 mb-3 flex items-center gap-2 uppercase text-xs tracking-wider">
-                                                <div className="w-1.5 h-4 bg-emerald-500 rounded-full" /> Détails du Diagnostic
-                                            </h4>
-
-                                            <div className="mb-4 pb-4 border-b border-stone-200">
-                                                <p className="text-stone-600 text-sm">
-                                                    Cible : <span className="text-emerald-900 font-bold">{result.detection_details?.full_name_en || "N/A"}, {result.detection_details?.short_code || "N/A"}</span>
-                                                </p>
-                                            </div>
-
-                                            <div className="space-y-3">
-                                                <p className="text-stone-600 text-xs font-bold uppercase tracking-tight">Pathologies Détectées:</p>
-                                                <div className="flex flex-wrap gap-2">
-                                                    {result.detection_details?.pathologies?.map((path: string, i: number) => (
-                                                        <span key={i} className="px-3 py-1 bg-white border border-emerald-100 rounded-lg text-emerald-800 text-xs font-medium shadow-sm">
-                                                            {path}
-                                                        </span>
-                                                    )) || <span className="text-stone-400 text-xs italic">Aucune pathologie spécifique détectée</span>}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <h4 className="font-bold text-emerald-900 mb-2 flex items-center gap-2 italic">
-                                            <div className="w-1.5 h-4 bg-emerald-500 rounded-full" /> Conseil du Dr. Agronome
+                                    <div className="bg-stone-50 p-6 rounded-2xl border border-stone-100">
+                                        <h4 className="font-bold text-emerald-900 mb-3 flex items-center gap-2 uppercase text-xs tracking-wider">
+                                            <div className="w-1.5 h-4 bg-emerald-500 rounded-full" /> Détails du Diagnostic
                                         </h4>
-                                        <div className="text-stone-700 leading-relaxed bg-stone-50 p-6 rounded-2xl border border-stone-100">
-                                            {result.treatment_advice}
+                                        <div className="mb-4 pb-4 border-b border-stone-200">
+                                            <p className="text-stone-600 text-sm">
+                                                Cible : <span className="text-emerald-900 font-bold">{result.detection_details?.full_name_en || "N/A"}, {result.detection_details?.short_code || "N/A"}</span>
+                                            </p>
+                                        </div>
+                                        <div className="space-y-3">
+                                            <p className="text-stone-600 text-xs font-bold uppercase tracking-tight">Pathologies Détectées:</p>
+                                            <div className="flex flex-wrap gap-2">
+                                                {result.detection_details?.pathologies?.map((path: string, i: number) => (
+                                                    <span key={i} className="px-3 py-1 bg-white border border-emerald-100 rounded-lg text-emerald-800 text-xs font-medium shadow-sm">
+                                                        {path}
+                                                    </span>
+                                                )) || <span className="text-stone-400 text-xs italic">Aucune pathologie spécifique détectée</span>}
+                                            </div>
                                         </div>
                                     </div>
+
                                     <button onClick={reset} className="flex items-center gap-2 text-emerald-600 font-bold hover:underline group">
                                         Effectuer un autre scan <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                                     </button>
                                 </div>
+
                                 <div className="relative">
                                     <img
                                         src={result.image_url ? `http://localhost:8000/${result.image_url}` : preview!}
@@ -222,6 +238,88 @@ export default function DiagnosticPlantePage() {
                                 </div>
                             </div>
                         </div>
+
+                        {/* ── Bouton Ordonnance RAG ─────────────────────── */}
+                        {!ordonnance && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="bg-white rounded-3xl border border-emerald-100 p-8 shadow-sm"
+                            >
+                                <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+                                    <div className="flex-1">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <Pill className="w-5 h-5 text-emerald-600" />
+                                            <h3 className="font-bold text-emerald-950 text-lg">Ordonnance Phytosanitaire IA</h3>
+                                        </div>
+                                        <p className="text-stone-500 text-sm">
+                                            Générez une prescription ONSSA personnalisée avec les produits homologués, doses et délais avant récolte.
+                                        </p>
+                                    </div>
+                                    <button
+                                        onClick={handleGetOrdonnance}
+                                        disabled={isLoadingOrdonnance}
+                                        className="shrink-0 px-8 py-4 bg-emerald-600 text-white font-bold rounded-xl flex items-center gap-2 hover:bg-emerald-700 disabled:opacity-60 transition-all shadow-lg shadow-emerald-600/20"
+                                    >
+                                        {isLoadingOrdonnance ? (
+                                            <><Loader2 className="w-5 h-5 animate-spin" /> Génération en cours...</>
+                                        ) : (
+                                            <><ClipboardList className="w-5 h-5" /> Générer l'ordonnance</>
+                                        )}
+                                    </button>
+                                </div>
+                                {ordonnanceError && (
+                                    <div className="mt-4 p-4 bg-red-50 text-red-600 border border-red-200 rounded-xl text-sm font-medium flex items-center gap-2">
+                                        <AlertCircle className="w-5 h-5" /> {ordonnanceError}
+                                    </div>
+                                )}
+                            </motion.div>
+                        )}
+
+                        {/* ── Résultat Ordonnance RAG ───────────────────── */}
+                        <AnimatePresence>
+                            {ordonnance && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 16 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="bg-white rounded-3xl border border-emerald-200 overflow-hidden shadow-xl"
+                                >
+                                    <div className="bg-gradient-to-r from-emerald-800 to-emerald-950 px-8 py-5 flex items-center gap-3">
+                                        <ClipboardList className="w-6 h-6 text-emerald-300" />
+                                        <div>
+                                            <p className="text-white font-bold text-lg">Ordonnance Phytosanitaire</p>
+                                            <p className="text-emerald-300 text-xs">Générée par ONSSA Knowledge Base · RAG IA</p>
+                                        </div>
+                                        {ordonnance.nom_maladie && (
+                                            <span className="ml-auto px-4 py-1.5 bg-white/10 text-white rounded-full text-sm font-medium border border-white/10">
+                                                {ordonnance.nom_maladie}
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    <div className="p-8">
+                                        <pre className="whitespace-pre-wrap font-mono text-sm text-stone-800 bg-stone-50 p-6 rounded-2xl border border-stone-100 leading-relaxed">
+                                            {ordonnance.ordonnance}
+                                        </pre>
+
+                                        {ordonnance.sources_utilisees && (
+                                            <div className="mt-4 flex items-center gap-2 text-stone-400 text-xs">
+                                                <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full" />
+                                                Source : {ordonnance.sources_utilisees}
+                                            </div>
+                                        )}
+
+                                        <button
+                                            onClick={() => { setOrdonnance(null); setOrdonnanceError(null); }}
+                                            className="mt-6 text-sm text-stone-500 hover:underline"
+                                        >
+                                            Régénérer l'ordonnance
+                                        </button>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
                     </motion.div>
                 )}
             </AnimatePresence>

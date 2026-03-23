@@ -113,6 +113,27 @@ export const diagnosticAPI = {
         return response.json();
     },
 
+    // Génère une ordonnance RAG pour un diagnostic existant
+    getOrdonnance: async (diagnosticId: number, culture?: string): Promise<any> => {
+        const token = localStorage.getItem('token');
+        const formData = new FormData();
+        if (culture) formData.append('culture', culture);
+
+        const response = await fetch(`${API_BASE_URL}/diagnostic/${diagnosticId}/ordonnance`, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            },
+            body: formData,
+        });
+
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.detail || "Erreur lors de la génération de l'ordonnance");
+        }
+        return response.json();
+    },
+
     // Récupère l'historique des diagnostics
     getHistory: async (type?: string): Promise<any> => {
         const token = localStorage.getItem('token');
