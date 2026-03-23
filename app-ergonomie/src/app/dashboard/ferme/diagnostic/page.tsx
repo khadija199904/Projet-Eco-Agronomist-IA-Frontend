@@ -6,6 +6,7 @@ import { diagnosticAPI } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import { motion, AnimatePresence } from 'motion/react';
 import MobileScanner from '@/components/MobileScanner';
+import { compressImage } from '@/lib/image-utils';
 
 export default function DiagnosticPlantePage() {
     const { user } = useAuth();
@@ -40,13 +41,24 @@ export default function DiagnosticPlantePage() {
         setIsLoading(true);
         setError(null);
 
-        const formData = new FormData();
-        formData.append('file', file);
-        if (user.organization_id) {
-            formData.append('organization_id', user.organization_id.toString());
-        }
-
         try {
+            // Client-side compression to reduce upload latency
+            let fileToUpload = file;
+            if (file.size > 500 * 1024) { // Compresser si > 500KB
+                try {
+                    fileToUpload = await compressImage(file);
+                } catch (cmpErr) {
+                    console.error("Compression warning:", cmpErr);
+                    // On continue avec l'original si la compression échoue
+                }
+            }
+
+            const formData = new FormData();
+            formData.append('file', fileToUpload);
+            if (user.organization_id) {
+                formData.append('organization_id', user.organization_id.toString());
+            }
+
             const data = await diagnosticAPI.uploadPlant(formData);
             setResult(data);
         } catch (err: any) {

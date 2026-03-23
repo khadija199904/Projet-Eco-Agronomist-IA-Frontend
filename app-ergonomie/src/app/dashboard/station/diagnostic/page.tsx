@@ -6,6 +6,7 @@ import { diagnosticAPI } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import { motion, AnimatePresence } from 'motion/react';
 import MobileScanner from '@/components/MobileScanner';
+import { compressImage } from '@/lib/image-utils';
 
 export default function DiagnosticProduitPage() {
     const { user } = useAuth();
@@ -34,15 +35,25 @@ export default function DiagnosticProduitPage() {
         setIsLoading(true);
         setError(null);
 
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('lot_recolte_id', lotId);
-        
-        if (user.organization_id) {
-            formData.append('organization_id', user.organization_id.toString());
-        }
-
         try {
+            // Client-side compression to reduce upload latency
+            let fileToUpload = file;
+            if (file.size > 500 * 1024) { // Compresser si > 500KB
+                try {
+                    fileToUpload = await compressImage(file);
+                } catch (cmpErr) {
+                    console.error("Compression warning:", cmpErr);
+                }
+            }
+
+            const formData = new FormData();
+            formData.append('file', fileToUpload);
+            formData.append('lot_recolte_id', lotId);
+            
+            if (user.organization_id) {
+                formData.append('organization_id', user.organization_id.toString());
+            }
+
             const data = await diagnosticAPI.uploadProduct(formData);
             setResult(data);
         } catch (err: any) {
