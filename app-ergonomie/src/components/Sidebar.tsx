@@ -15,7 +15,8 @@ import {
     LogOut,
     ChevronRight,
     User as UserIcon,
-    Truck
+    Truck,
+    QrCode
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
@@ -39,7 +40,15 @@ export default function Sidebar() {
         { name: 'Valorisation', href: '/dashboard/station/valorisation', icon: Zap },
     ];
 
-    const menuItems = user?.role === 'agriculteur' ? agriculteurItems : qualiteItems;
+    const consommateurItems = [
+        { name: 'Mon Assiette', href: '/dashboard/consommateur', icon: LayoutDashboard },
+    ];
+
+    const menuItems = user?.role === 'agriculteur' 
+        ? agriculteurItems 
+        : user?.role === 'consommateur' 
+            ? consommateurItems 
+            : qualiteItems;
 
     return (
         <aside className="fixed left-0 top-0 h-screen w-64 bg-emerald-950 text-white flex flex-col z-50 border-r border-white/5">

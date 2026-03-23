@@ -13,6 +13,8 @@ export default function DashboardPage() {
             console.log("Dashboard redirect - User Role:", user?.role);
             if (user?.role === 'agriculteur') {
                 router.push('/dashboard/ferme');
+            } else if (user?.role === 'consommateur') {
+                router.push('/dashboard/consommateur');
             } else {
                 // Default to station for qualite or unknown roles
                 router.push('/dashboard/station');

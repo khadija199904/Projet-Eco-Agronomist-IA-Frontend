@@ -149,6 +149,25 @@ export const diagnosticAPI = {
 
         if (!response.ok) throw new Error("Erreur lors de la récupération de l'historique");
         return response.json();
+    },
+
+    // Analyse une image de fraîcheur pour le consommateur (Fresh vs Rotten)
+    uploadConsumerDiagnostic: async (formData: FormData): Promise<any> => {
+        const token = localStorage.getItem('token');
+        
+        const response = await fetch(`${API_BASE_URL}/diagnostic/consume`, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            },
+            body: formData,
+        });
+
+        if (!response.ok) {
+            const err = await response.json().catch(() => ({ detail: "Erreur lors du diagnostic fraîcheur" }));
+            throw new Error(err.detail || "Erreur lors du diagnostic");
+        }
+        return response.json();
     }
 };
 
